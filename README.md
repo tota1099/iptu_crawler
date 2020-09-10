@@ -22,15 +22,29 @@ Download page: https://www.google.pt/intl/pt-PT/chrome/
 
 Download Google Chrome Driver from here: https://chromedriver.chromium.org/downloads
 
-## Create virtual env
+### Create virtual env
 
 ``` bash
-virtualenv -p python3.6 env
-env/bin/activate
+$ virtualenv -p python3.6 env
+$ env/bin/activate
 ```
 
-## Install Dependencies
+### Install Dependencies
 
 ``` bash
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
+
+### Create folder to save codigo de barras
+
+``` bash
+$ mkdir codigoDeBarras
+```
+
+## Run Robot :D
+
+``` bash
+$ source env/bin/activate
+$ python run.py
+```
+

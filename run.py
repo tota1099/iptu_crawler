@@ -1,51 +1,21 @@
-import os
-import time
-from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from BELO_HORIZONTE.Form import Inputs, Buttons
+from browser import chrome_browser
+from Prefeituras.BH.Site import Site
+from Prefeituras.BH.Boleto import Boleto
 
-ROOT_DIR = os.path.realpath(os.path.dirname(__file__))
-URL = 'http://iptuonline.siatu.pbh.gov.br/IptuOnline/index.xhtml'
+browser = chrome_browser.get_browser('chromedriver')
 
-def get_browser(driver, download_dir = None):
+try:
+  indice_iptu = '4922180050092'
+  browser.get('http://iptuonline.siatu.pbh.gov.br/IptuOnline/index.xhtml')
+  Site.login(browser, '{}.{} .{} .{}.{}'.format(indice_iptu[0:3], indice_iptu[3:6], indice_iptu[6:9], indice_iptu[9:12], indice_iptu[12]))
+  Site.open_bill(browser)
+
+  [print('{}: {}'.format(key, parcela)) for key, parcela in Boleto.getParcelas(browser)]
+  print('Linha Digitável: ' + Boleto.getLinhaDigitavel(browser))
+  print('Data Vencimento: ' + Boleto.getDataVencimento(browser))
+  Boleto.saveBarras(browser, indice_iptu);
   
-    driver_bin = driver
-    bin_path =  os.path.join(ROOT_DIR, driver_bin)
-    os.environ['PATH'] = f"{os.getenv('PATH')}:{bin_path}"
+except Exception as e:
+  print(f"ERROR: {e}")
 
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--no-sandbox')
-    browser = webdriver.Chrome(executable_path=bin_path, 
-                                        options=chrome_options)
-
-    return browser
-
-def get_time_now():
-    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-def init():
-  print(f"{get_time_now()} Starting... ")
-
-  browser = get_browser('chromedriver')
-
-  try:
-    wait = WebDriverWait(browser, 5)
-    browser.get(URL)
-    browser.find_element_by_id(Inputs.IPTU_INDICE.value).send_keys('492.218 .005 .009.2')
-    browser.find_element_by_id(Buttons.PESQUISAR.value).click()
-
-    time.sleep(2)
-    browser.execute_script("mojarra.jsfcljs(document.getElementById('form'),{'form:timoveis:0:j_idt33':'form:timoveis:0:j_idt33'},'_blank');")
-    time.sleep(2)
-
-    browser.switch_to.window(browser.window_handles[-1])
-    browser.save_screenshot('iptu.png')
-  except Exception as e:
-    print(f"{get_time_now()} Try again! This error has not handled")
-    print(f"{get_time_now()} ERROR: {e}")
-    browser.quit()
-    exit(0)
-
-if __name__ == '__main__':
-  init()
+browser.quit()

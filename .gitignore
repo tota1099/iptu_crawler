@@ -1,2 +1,4 @@
 env
-iptu.jpg
+__pycache__/
+ *.pyc
+codigoDeBarras/*
